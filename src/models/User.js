@@ -46,6 +46,9 @@ const userSchema = new Schema({
         token: String,
         createdAt: {
             type: Date, default: Date.now
+        },
+        expiresAt: {
+            type: Date
         }
     }],
 
