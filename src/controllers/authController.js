@@ -137,7 +137,6 @@ exports.login = async (req, res) => {
             process.env.JWT_REFRESH_SECRET,
             { expiresIn: process.env.REFRESH_TOKEN_EXPIREY }
         )
-
         // Save refresh token to user 
         user.refreshTokens.push({
             token: refreshToken,
