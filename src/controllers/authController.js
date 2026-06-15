@@ -220,3 +220,72 @@ exports.refreshToken = async ()=>{
     }
 }
 
+
+//Logout
+
+exports.logout = async (req, res) => {
+    try {
+        const refreshToken = req.cookies.refreshToken
+        if (!refreshToken) {
+            return res.status(204).send()
+        }
+
+        // find user
+        const user = await User.findOne({
+            refreshTokens: { $elemMatch: { token: refreshToken } }
+        })
+
+        if (user) {
+            user.refreshTokens = user.refreshTokens.filter(rt => rt.token !== refreshToken)
+            await user.save()
+        }
+
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV == 'production',
+            sameSite: 'strict'
+        })
+
+        res.status(200).json({
+            success: true,
+            message: 'Logged out successfully'
+        })
+
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error During Logout' })
+    }
+}
+
+// logoutAll
+
+exports.logoutAll = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id)
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' })
+        }
+
+       
+
+        user.refreshTokens = []
+        await user.save()
+
+        // Clear Cookie
+
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV == 'production',
+            sameSite: 'strict'
+        })
+
+        res.status(200).json({
+            success: true,
+            message: 'Logged out From all devices'
+        })
+
+
+    } catch (error) {
+        res.status(500).json({ message: 'Server Error During Logout From All Devices' })
+    }
+}
