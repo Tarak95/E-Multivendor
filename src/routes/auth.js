@@ -3,6 +3,11 @@ const router = express.Router()
 const { verifyEmail } = require('../controllers/verifyEmail')
 const { register,login,refreshToken } = require('../controllers/authController')
 const {protect,restrictTo}=require('../middlewares/auth')
+const validate = require('../middlewares/validate')
+const { registrationSchema, loginSchema } = require('../validations/auth.validation')
+
+const { registerLimiter, loginLimiter, refreshLimiter } = require('../middlewares/rateLimiter')
+
 
 /**
  * @swagger
@@ -38,8 +43,8 @@ const {protect,restrictTo}=require('../middlewares/auth')
  *              description: Bad Request
  */
 
-router.post('/register', register)
-router.get('/verify-email', verifyEmail)
+router.post('/register', registerLimiter, validate(registrationSchema), register)
+router.get('/verify-email', validate(loginSchema), verifyEmail)
 router.post('/login', login)
 router.post('/refresh-token',refreshToken)
 
