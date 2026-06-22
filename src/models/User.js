@@ -73,19 +73,19 @@ const userSchema = new Schema({
 
 
 
-// PASSWORD HASH (সংশোধিত অংশ)
+// PASSWORD HASH 
 userSchema.pre('save', async function () {
-    // যদি পাসওয়ার্ড পরিবর্তন না হয়, তবে এখানেই কাজ শেষ (রিটার্ন) করবে
+    
     if (!this.isModified('password')) return;
 
-    // পাসওয়ার্ড হ্যাশ করার লজিক
+    
     const salt = await bcrypt.genSalt(12);
     this.password = await bcrypt.hash(this.password, salt);
     
-    // কোনো next() কল করার প্রয়োজন নেই, async ফাংশন নিজে থেকেই পরবর্তী ধাপে চলে যাবে
+    
 });
 
-// COMPARE PASSWORD (এটি ঠিক আছে, তাও পরিচ্ছন্ন করে দেওয়া হলো)
+// COMPARE PASSWORD 
 userSchema.methods.comparePassword = async function (candidatePassword) {
     return await bcrypt.compare(candidatePassword, this.password);
 };
